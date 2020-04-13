@@ -1,4 +1,3 @@
-#include <cassert>
 #include "ReferenceCounter.h"
 
 template <typename T>
