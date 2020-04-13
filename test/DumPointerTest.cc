@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include "../src/DumPointer.h"
 #include "gtest/gtest.h"
@@ -24,6 +23,16 @@ class TestClass {
       return "DumPointer says: " + str;
     }
 };
+
+// Test if the object is nullptr.
+TEST(DumPointerTest, null_pointer) {
+  bool flag = false;
+
+  DumPointer<TestClass> ptr(nullptr);
+
+  // The flag should remain false since no class has been instantiated.
+  EXPECT_FALSE(flag);
+}
 
 // Test if the object is created correctly.
 TEST(DumPointerTest, create_a_dum_pointer) {
