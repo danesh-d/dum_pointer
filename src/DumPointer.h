@@ -15,14 +15,19 @@ class DumPointer {
     DumPointer(T *createdObjPtr)
       : m_objPtr(createdObjPtr),
         m_rc(new ReferenceCounter()) {
-      assert(m_rc != nullptr);
-      m_rc->addReference();
+      if (m_rc) {
+        m_rc->addReference();
+      }
     }
 
     virtual ~DumPointer() {
-      if (m_rc->releaseReference() == 0) {
+      if (m_rc) {
+        if (m_rc->releaseReference() == 0) {
+          delete m_objPtr;
+          delete m_rc;
+        }
+      } else {
         delete m_objPtr;
-        delete m_rc;
       }
     }
 
@@ -30,7 +35,9 @@ class DumPointer {
     DumPointer(const DumPointer<T>& anotherObj)
       : m_objPtr(anotherObj.m_objPtr),
         m_rc(anotherObj.m_rc) {
-      m_rc->addReference();
+      if (m_rc) {
+        m_rc->addReference();
+      }
     }
 
     // Operator overloading for assignment. This will be called when an object
@@ -40,8 +47,12 @@ class DumPointer {
       if (this != &anotherObj) {
         // The current object will be replaced so decrement its reference and
         // release it if no one uses it.
-        if (m_rc->releaseReference() == 0) {
-          delete m_rc;
+        if (m_rc) {
+          if (m_rc->releaseReference() == 0) {
+            delete m_rc;
+            delete m_objPtr;
+          }
+        } else {
           delete m_objPtr;
         }
 
@@ -50,7 +61,9 @@ class DumPointer {
         m_rc = anotherObj.m_rc;
 
         // Increment the reference of the newly assigned object.
-        m_rc->addReference();
+        if (m_rc) {
+          m_rc->addReference();
+        }
       }
 
       return *this;
